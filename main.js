@@ -9,7 +9,47 @@ const character = {
     defaultHP:100,
     damageHP:100,
     elHP: document.getElementById('health-character'),
-    elProgressbar: document.getElementById('progressbar-character')
+    elProgressbar: document.getElementById('progressbar-character'),
+    changeHP: function(count){
+    
+        if(this.damageHP<count){
+            this.damageHP = 0;
+            alert('Бедный ' + this.name + ' проиграл бой');
+            $btn.disabled = true;
+        } else {
+            this.damageHP -= count;
+        }
+        
+        const log = this === enemy ? generateLog(this, character, count) : generateLog(this, enemy, count);
+        
+        const $p = document.createElement('p');
+        $p.innerText = log;
+        $logs.insertBefore($p, $logs.children[0]);
+        console.log(log);
+    
+        this.renderHP();
+    },
+    renderHP: function(){
+        this.renderHPLife();
+        this.renderProgressbarHP();
+        if(this.name === character.name){
+            const { weakness, name, type = 'type isn\'t defined', defaultHP, damageHP} = character;
+            console.log(name, type, weakness, damageHP, defaultHP);
+        }
+        else if(this.name === enemy.name){
+            const { weakness:wEn, name:nEn, type:tEn = 'type isn\'t defined', defaultHP:dHP, damageHP:daHP} = enemy;
+            console.log(nEn, tEn, wEn, daHP, dHP);
+        }
+        else{
+            console.log('Кого ты вообще ударил?');
+        }
+    },
+    renderHPLife: function (){
+        this.elHP.innerText = this.damageHP + '/' + this.defaultHP;
+    },
+    renderProgressbarHP: function (){
+        this.elProgressbar.style.width = this.damageHP + '%';
+    }
 };
 const enemy = {
     name: 'Charmander',
@@ -19,9 +59,52 @@ const enemy = {
     defaultHP:100,
     damageHP:100,
     elHP: document.getElementById('health-enemy'),
-    elProgressbar: document.getElementById('progressbar-enemy')
+    elProgressbar: document.getElementById('progressbar-enemy'),
+    changeHP: function(count){
+        
+    
+        if(this.damageHP<count){
+            this.damageHP = 0;
+            alert('Бедный ' + this.name + ' проиграл бой');
+            $btn.disabled = true;
+        } else {
+            this.damageHP -= count;
+        }
+        
+        const log = this === enemy ? generateLog(this, character, count) : generateLog(this, enemy, count);
+        
+        const $p = document.createElement('p');
+        $p.innerText = log;
+        $logs.insertBefore($p, $logs.children[0]);
+        console.log(log);
+    
+        this.renderHP();
+    },
+    
+    renderHP(){
+        this.renderHPLife();
+        this.renderProgressbarHP();
+        if(this.name === character.name){
+            const { weakness, name, type = 'type isn\'t defined', defaultHP, damageHP} = character;
+            console.log(name, type, weakness, damageHP, defaultHP);
+        }
+        else if(this.name === enemy.name){
+            const { weakness:wEn, name:nEn, type:tEn = 'type isn\'t defined', defaultHP:dHP, damageHP:daHP} = enemy;
+            console.log(nEn, tEn, wEn, daHP, dHP);
+        }
+        else{
+            console.log('Кого ты ударил?');
+        }
+    },
+    renderHPLife: function (){
+        this.elHP.innerText = this.damageHP + '/' + this.defaultHP;
+    },
+    renderProgressbarHP: function (){
+        this.elProgressbar.style.width = this.damageHP + '%';
+    }
+    
 };
-function generateLog(firstPerson, secondPerson){
+const generateLog=(firstPerson, secondPerson, dmg)=>{
     const logs = [
         `${firstPerson.name} вспомнил что-то важное, но неожиданно ${secondPerson.name}, не помня себя от испуга, ударил в предплечье врага. ${firstPerson.damageHP},[${firstPerson.defaultHP-firstPerson.damageHP}/${firstPerson.defaultHP}]`,
         `${firstPerson.name}  поперхнулся, и за это ${secondPerson.name} с испугу приложил прямой удар коленом в лоб врага. ,[${firstPerson.defaultHP-firstPerson.damageHP}/${firstPerson.defaultHP}]`,
@@ -34,64 +117,51 @@ function generateLog(firstPerson, secondPerson){
         `${firstPerson.name}  расстроился, как вдруг, неожиданно ${secondPerson.name} случайно влепил стопой в живот соперника.${firstPerson.damageHP},[${firstPerson.defaultHP-firstPerson.damageHP}/${firstPerson.defaultHP}]`,
         `${firstPerson.name}  пытался что-то сказать, но вдруг, неожиданно ${secondPerson.name} со скуки, разбил бровь сопернику.${firstPerson.damageHP},[${firstPerson.defaultHP-firstPerson.damageHP}/${firstPerson.defaultHP}]`
     ];
+
     return logs[random(logs.length) - 1]
 }
+function f(){
+    let click= 0;
+    let num = -1;
+    return function() {
+        click++;
+        if(num == -1){
+            num = prompt("Введите  число ходов");
+        }
+        if(click <= num - 1) {
+            console.log(" Кол-во кликов ", click);
+            console.log("Кликов осталось ", (num - click));
+        }
+        else{
+            $btn.disabled = true;
+            $btn1.disabled = true;
+            console.log("Клики закончились ", click);
+           
+        }
+    }
+    
+}
+
+const count1 = f();
+const count2 = f();
+
 $btn.addEventListener('click', function() {
     console.log('Kick');
-    changeHP.call(character, random(20));
-    changeHP.call(enemy, random(20));
+    character.changeHP(random(20));
+    enemy.changeHP(random(20));
+    count1();
 });
 $btn1.addEventListener('click', function() {
     console.log('Ulta');
-    changeHP.call(character, random(500));
-    changeHP.call(enemy, random(500));
+    character.changeHP(random(500));
+    enemy.changeHP(random(500));
+    count2();
 });
-function init() {
+const init =()=> {
     console.log('Start Game!');
-    renderHP.call(character);
-    renderHP.call(enemy);
 }
-function renderHP(){
-    renderHPLife.call(this);
-    renderProgressbarHP.call(this);
-    if(this.name === character.name){
-        const { weakness, name, type = 'type isn\'t defined', defaultHP, damageHP} = character;
-        console.log(name, type, weakness, damageHP, defaultHP);
-    }
-    else if(this.name === enemy.name){
-        const { weakness:wEn, name:nEn, type:tEn = 'type isn\'t defined', defaultHP:dHP, damageHP:daHP} = enemy;
-        console.log(nEn, tEn, wEn, daHP, dHP);
-    }
-    else{
-        console.log('Кого ты ударил?');
-    }
-}
-function renderHPLife(){
-    this.elHP.innerText = this.damageHP + '/' + this.defaultHP;
-}
-function renderProgressbarHP(){
-    this.elProgressbar.style.width = this.damageHP + '%';
-}
-function changeHP(count){
-    
-    if(this.damageHP<count){
-        this.damageHP = 0;
-        alert('Бедный ' + this.name + ' проиграл бой');
-        $btn.disabled = true;
-    } else {
-        this.damageHP -= count;
-    }
-    
-    const log = this === enemy ? generateLog(this, character) : generateLog(this, enemy);
-    
-    const $p = document.createElement('p');
-    $p.innerText = log;
-    $logs.insertBefore($p, $logs.children[0]);
-    console.log(log);
-
-    renderHP.call(this);
-}
-function random(num){
+const random= (num)=>{
     return Math.ceil(Math.random()*num);
 }
+
 init();
